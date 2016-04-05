@@ -3,3 +3,8 @@ c:\users\mcsimusic\documents\visual studio 2010\Projects\ImageEdit\ImageEdit\bin
 c:\users\mcsimusic\documents\visual studio 2010\Projects\ImageEdit\ImageEdit\obj\Debug\ResolveAssemblyReference.cache
 c:\users\mcsimusic\documents\visual studio 2010\Projects\ImageEdit\ImageEdit\obj\Debug\ImageEdit.dll
 c:\users\mcsimusic\documents\visual studio 2010\Projects\ImageEdit\ImageEdit\obj\Debug\ImageEdit.pdb
+C:\Users\MCSIMUSIC\Documents\ImageEditor\ImageEdit\ImageEdit\bin\ImageEdit.dll
+C:\Users\MCSIMUSIC\Documents\ImageEditor\ImageEdit\ImageEdit\bin\ImageEdit.pdb
+C:\Users\MCSIMUSIC\Documents\ImageEditor\ImageEdit\ImageEdit\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\MCSIMUSIC\Documents\ImageEditor\ImageEdit\ImageEdit\obj\Debug\ImageEdit.dll
+C:\Users\MCSIMUSIC\Documents\ImageEditor\ImageEdit\ImageEdit\obj\Debug\ImageEdit.pdb
