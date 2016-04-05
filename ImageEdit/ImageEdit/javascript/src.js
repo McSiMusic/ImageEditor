@@ -79,6 +79,9 @@
         mainCanvasContext.clearRect(0, 0, mainCanvasContext.canvas.width, mainCanvasContext.canvas.height);
 
         var oldScale = imageScale;
+        var oldY = canvasRectangle.y;
+        var oldX = canvasRectangle.x;
+
         var imgHeight = imageRectangle.height;
         var imgWidth = imageRectangle.width;
         var canvasHeight = mainCanvasContext.canvas.height;
@@ -86,53 +89,36 @@
         var verticalScale = imgHeight / canvasHeight;
         var horizontalScale = imgWidth / canvasWidth;
         if (verticalScale > horizontalScale) {
-            var oldX = canvasRectangle.x;
             imageScale = verticalScale;
             canvasRectangle.x = (canvasWidth - imgWidth / verticalScale) / 2;
             canvasRectangle.y = 0;
-            canvasRectangle.width = imgWidth / verticalScale;
-            canvasRectangle.height = imgHeight / verticalScale;
-            mainCanvasContext.drawImage(image, imageRectangle.x, imageRectangle.y, imageRectangle.width, imageRectangle.height,
-                                         canvasRectangle.x, canvasRectangle.y, canvasRectangle.width, canvasRectangle.height);
-
-            if (isCropModeActivated) {
-                if (cropRectangle.isNull()) {
-                    cropRectangle.x = (canvasWidth - imgWidth / verticalScale) / 2;
-                    cropRectangle.width = imgWidth / verticalScale;
-                    cropRectangle.height = imgHeight / verticalScale;
-                }
-                else {
-                    var scaleRatio = oldScale / imageScale;
-                    cropRectangle.multiplyDimensions(scaleRatio);
-                    cropRectangle.x = canvasRectangle.x + ((cropRectangle.x - oldX) * scaleRatio);
-                    cropRectangle.y *= scaleRatio;
-                }
-                cropCanvasContext.drawImage(cropImage, cropRectangle.x, cropRectangle.y, cropRectangle.width, cropRectangle.height);
-            }
         }
         else {
-            var oldY = canvasRectangle.y;
+
             imageScale = horizontalScale;
             canvasRectangle.x = 0;
             canvasRectangle.y = (canvasHeight - imgHeight / horizontalScale) / 2;
-            canvasRectangle.width = imgWidth / horizontalScale;
-            canvasRectangle.height = imgHeight / horizontalScale;
-            mainCanvasContext.drawImage(image, imageRectangle.x, imageRectangle.y, imageRectangle.width, imageRectangle.height,
+
+        }
+        canvasRectangle.width = imgWidth / imageScale;
+        canvasRectangle.height = imgHeight / imageScale;
+        mainCanvasContext.drawImage(image, imageRectangle.x, imageRectangle.y, imageRectangle.width, imageRectangle.height,
                                          canvasRectangle.x, canvasRectangle.y, canvasRectangle.width, canvasRectangle.height);
-            if (isCropModeActivated) {
-                if (cropRectangle.isNull()) {
-                    cropRectangle.y = (canvasHeight - imgHeight / horizontalScale) / 2;
-                    cropRectangle.width = imgWidth / horizontalScale;
-                    cropRectangle.height = imgHeight / horizontalScale;
-                }
-                else {
-                    var scaleRatio = oldScale / imageScale;
-                    cropRectangle.multiplyDimensions(scaleRatio)
-                    cropRectangle.y = canvasRectangle.y + ((cropRectangle.y - oldY) * scaleRatio);
-                    cropRectangle.x *= scaleRatio;
-                }
-                cropCanvasContext.drawImage(cropImage, cropRectangle.x, cropRectangle.y, cropRectangle.width, cropRectangle.height);
+
+        if (isCropModeActivated) {
+            if (cropRectangle.isNull()) {
+                cropRectangle.x = canvasRectangle.x;
+                cropRectangle.y = canvasRectangle.y;
+                cropRectangle.width = canvasRectangle.width;
+                cropRectangle.height = canvasRectangle.height;
             }
+            else {
+                var scaleRatio = oldScale / imageScale;
+                cropRectangle.multiplyDimensions(scaleRatio);
+                cropRectangle.x = canvasRectangle.x + ((cropRectangle.x - oldX) * scaleRatio);
+                cropRectangle.y = canvasRectangle.y + ((cropRectangle.y - oldY) * scaleRatio);
+            }
+            cropCanvasContext.drawImage(cropImage, cropRectangle.x, cropRectangle.y, cropRectangle.width, cropRectangle.height);
         }
         updateBrightness();
     }
@@ -153,12 +139,7 @@
                 }
 
                 image.src = URL.createObjectURL(event.target.files[0]);
-                $("#applyCropButton").prop("disabled", false);
-                $("#cropButton").prop("disabled", false);
-                $("#grayscaleButton").prop("disabled", false);
-                $("#reduceBrightnessButton").prop("disabled", false);
-                $("#increaseBrightnessButton").prop("disabled", false);
-                $("#uploadButton").prop("disabled", false);
+                setButtonsDisabled(false);
             }
         }
         else {
@@ -168,6 +149,8 @@
 
     $("#cropButton").click(function (event) {
         isCropModeActivated = !isCropModeActivated;
+        setButtonsDisabled(isCropModeActivated);
+
         if (isCropModeActivated) {
             cropCanvasContext.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
             if (!cropImage) {
@@ -185,6 +168,7 @@
             cropImage.src = "cropImage.png";
             $("#cropCanvas").show();
             $("#applyCropButton").prop("disabled", false);
+            $("#cropButton").prop("disabled", false);
             $("#cropButton").prop("value", "Cancel crop");
         }
         else {
@@ -203,6 +187,7 @@
         $("#cropCanvas").hide();
         $("#applyCropButton").prop("disabled", true);
         $("#cropButton").prop("value", "Crop");
+        setButtonsDisabled(false);
         cropRectangle = new Rectangle();
         isCropModeActivated = false;
         onImageChange();
@@ -227,14 +212,7 @@
     });
 
     $("#uploadButton").click(function () {
-        $("#openbutton").prop("disabled", true);
-        $("#applyCropButton").prop("disabled", true);
-        $("#cropButton").prop("disabled", true);
-        $("#grayscaleButton").prop("disabled", true);
-        $("#reduceBrightnessButton").prop("disabled", true);
-        $("#increaseBrightnessButton").prop("disabled", true);
-        $("#uploadButton").prop("disabled", true);
-
+        setButtonsDisabled(true);
 
         var imageData = mainCanvasContext.getImageData(canvasRectangle.x, canvasRectangle.y, canvasRectangle.width, canvasRectangle.height);
 
@@ -254,21 +232,27 @@
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
             success: function (msg) {
-                $("#openbutton").prop("disabled", false);
-                $("#cropButton").prop("disabled", false);
-                $("#grayscaleButton").prop("disabled", false);
-                $("#reduceBrightnessButton").prop("disabled", false);
-                $("#increaseBrightnessButton").prop("disabled", false);
-                $("#uploadButton").prop("disabled", false);
-                alert("Done, Picture Uploaded.");
+                setButtonsDisabled(false);
+                alert("Done, Picture Uploaded");
             },
             error: function (msg) {
-                alert('ajax error: ' + msg);
+                alert('Upload Error');
             }
         });
     });
 
+    //all buttons without apply crop
+    var setButtonsDisabled = function (isDisabled) {
+        $("#openbutton").prop("disabled", isDisabled);
+        $("#cropButton").prop("disabled", isDisabled);
+        $("#grayscaleButton").prop("disabled", isDisabled);
+        $("#reduceBrightnessButton").prop("disabled", isDisabled);
+        $("#increaseBrightnessButton").prop("disabled", isDisabled);
+        $("#uploadButton").prop("disabled", isDisabled);
+    }
+    //BUTTONS HANDLERS...
 
+    //CROP LOGIC...
     $("#cropCanvas").mousedown(function (event) {
         var parentOffset = $(this).offset();
         var mouseX = event.pageX - parentOffset.left;
@@ -290,9 +274,9 @@
     var isRightCropPointArea = function (x, y) {
         return ((Math.abs(x - cropRectangle.getRightX()) < MAX_CROP_MODE_CORNER_INTERACTION_AREA_WIDTH) && (Math.abs(y - cropRectangle.getBottomY()) < MAX_CROP_MODE_CORNER_INTERACTION_AREA_HEIGHT))
     }
-    //BUTTONS HANDLERS...
 
-    //CROP LOGIC...
+
+
     $("#cropCanvas").mousemove(function (event) {
         if (isCropAreaModified) {
             var parentOffset = $(this).offset();
