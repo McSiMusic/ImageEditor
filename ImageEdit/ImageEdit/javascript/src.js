@@ -141,16 +141,17 @@
     //BUTTONS HANDLERS...
     $("#openbutton").change(function (event) {
         if (window.File && window.FileReader) {
-            mainCanvasContext.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
-            image = new Image();
-            image.onload = function () {
-                imageRectangle.x = 0;
-                imageRectangle.y = 0;
-                imageRectangle.width = image.width;
-                imageRectangle.height = image.height;
-                onImageChange();
-            }
             if (event.target.files[0]) {
+                mainCanvasContext.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
+                image = new Image();
+                image.onload = function () {
+                    imageRectangle.x = 0;
+                    imageRectangle.y = 0;
+                    imageRectangle.width = image.width;
+                    imageRectangle.height = image.height;
+                    onImageChange();
+                }
+
                 image.src = URL.createObjectURL(event.target.files[0]);
                 $("#applyCropButton").prop("disabled", false);
                 $("#cropButton").prop("disabled", false);
