@@ -175,6 +175,7 @@
             $("#cropCanvas").hide();
             $("#applyCropButton").prop("disabled", true);
             $("#cropButton").prop("value", "Crop");
+            cropRectangle = new Rectangle(0, 0, 0, 0);
         }
     });
 
